@@ -153,9 +153,11 @@ class Data
             $qry = $nonceDb->prepare('INSERT OR IGNORE INTO nonce (value) VALUES(?)');
             $qry->execute([$nonce]);
             if ($qry->rowCount() !== 1) {
+								$this->logger->info('Codisto: rowCount !==1',['class'=>get_class($nonceDb)]);
                 return false;
             }
         } catch (\Exception $e) {
+						$this->logger->info('Codisto: '.$e->getMessage(),['trace'=>$e->getTrace()]);
             if (property_exists($e, 'errorInfo') &&
                     $e->errorInfo[0] == 'HY000' &&
                     $e->errorInfo[1] == 8 &&
@@ -177,13 +179,13 @@ class Data
                 return false;
             }
         }
-
         return $this->checkHash($key, $nonce, $hash);
     }
 
     public function checkHash($Key, $Nonce, $Hash)
     {
         $Sig = base64_encode(hash('sha256', $Key . $Nonce, true));
+				$this->logger->info('checkHash. Key: '.$Key.', Nonce: '.$Nonce.', hash: '.$hash.', Sig: '.$Sig);
 
         return hash_equals($Hash, $Sig);
     }
