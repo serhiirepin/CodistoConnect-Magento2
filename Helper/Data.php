@@ -152,8 +152,13 @@ class Data
             $nonceDb->exec('CREATE TABLE IF NOT EXISTS nonce (value text NOT NULL PRIMARY KEY)');
             $qry = $nonceDb->prepare('INSERT OR IGNORE INTO nonce (value) VALUES(?)');
             $qry->execute([$nonce]);
-            if ($qry->rowCount() !== 1) {
-								$this->logger->info('Codisto: rowCount !==1. It is '.$qry->rowCount(),['class'=>get_class($nonceDb)]);
+
+            $countQuery = $db->query('SELECT changes()');
+            $nonceInsertCount = (int)$countQuery->fetchColumn();
+            $countQuery->closeCursor();
+
+            if ($nonceInsertCount !== 1) {
+		$this->logger->info('nonceInsertCount !==1. It is '.$nonceInsertCount,['class'=>get_class($nonceDb)]);
                 return false;
             }
         } catch (\Exception $e) {
