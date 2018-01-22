@@ -190,7 +190,7 @@ class Data
     public function checkHash($Key, $Nonce, $Hash)
     {
         $Sig = base64_encode(hash('sha256', $Key . $Nonce, true));
-        $this->logger->info('checkHash. Key: '.$Key.', Nonce: '.$Nonce.', hash: '.$hash.', Sig: '.$Sig);
+        $this->logger->info('checkHash. Key: '.$Key.', Nonce: '.$Nonce.', Hash: '.$Hash.', Sig: '.$Sig);
 
         return hash_equals($Hash, $Sig);
     }
