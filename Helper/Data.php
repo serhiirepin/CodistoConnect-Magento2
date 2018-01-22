@@ -141,56 +141,56 @@ class Data
         $nonce = $server['HTTP_X_NONCE'];
         $hash = $server['HTTP_X_HASH'];
 
-    //     try {
-    //         $nonceDbPath = $this->getSyncPath('nonce.db');
-    //
-    //         $nonceDb = $this->createSqliteConnection($nonceDbPath);
-    //         $nonceDb->exec('PRAGMA synchronous=OFF');
-    //         $nonceDb->exec('PRAGMA temp_store=MEMORY');
-    //         $nonceDb->exec('PRAGMA page_size=65536');
-    //         $nonceDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-    //         $nonceDb->exec('CREATE TABLE IF NOT EXISTS nonce (value text NOT NULL PRIMARY KEY)');
-    //         $qry = $nonceDb->prepare('INSERT OR IGNORE INTO nonce (value) VALUES(?)');
-    //         $qry->execute([$nonce]);
-    //
-    //         $countQuery = $nonceDb->query('SELECT changes()');
-    //         $nonceInsertCount = (int)$countQuery->fetchColumn();
-    //         $countQuery->closeCursor();
-    //
-    //         if ($nonceInsertCount !== 1) {
-		// $this->logger->info('nonceInsertCount !==1. It is '.$nonceInsertCount,['class'=>get_class($nonceDb)]);
-    //             return false;
-    //         }
-    //     } catch (\Exception $e) {
-		// 				$this->logger->info('Codisto: '.$e->getMessage(),['trace'=>$e->getTrace()]);
-    //         if (property_exists($e, 'errorInfo') &&
-    //                 $e->errorInfo[0] == 'HY000' &&
-    //                 $e->errorInfo[1] == 8 &&
-    //                 $e->errorInfo[2] == 'attempt to write a readonly database') {
-    //             if ($this->file->fileExists($nonceDbPath)) {
-    //                 $this->file->rm($nonceDbPath);
-    //             }
-    //         } elseif (property_exists($e, 'errorInfo') &&
-    //                 $e->errorInfo[0] == 'HY000' &&
-    //                 $e->errorInfo[1] == 11 &&
-    //                 $e->errorInfo[2] == 'database disk image is malformed') {
-    //             if ($this->file->fileExists($nonceDbPath)) {
-    //                 $this->file->rm($nonceDbPath);
-    //             }
-    //         } else {
-    //             $this->logger->info('Exception: '.$e->getMessage()
-    //             .' on line: '.$e->getLine()
-    //             .' in file: '.$e->getFile());
-    //             return false;
-    //         }
-    //     }
+        try {
+            $nonceDbPath = $this->getSyncPath('nonce.db');
+
+            $nonceDb = $this->createSqliteConnection($nonceDbPath);
+            $nonceDb->exec('PRAGMA synchronous=OFF');
+            $nonceDb->exec('PRAGMA temp_store=MEMORY');
+            $nonceDb->exec('PRAGMA page_size=65536');
+            $nonceDb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $nonceDb->exec('CREATE TABLE IF NOT EXISTS nonce (value text NOT NULL PRIMARY KEY)');
+            $qry = $nonceDb->prepare('INSERT OR IGNORE INTO nonce (value) VALUES(?)');
+            $qry->execute([$nonce]);
+
+            $countQuery = $nonceDb->query('SELECT changes()');
+            $nonceInsertCount = (int)$countQuery->fetchColumn();
+            $countQuery->closeCursor();
+
+            if (false && $nonceInsertCount !== 1) {
+                $this->logger->info('nonceInsertCount !==1. It is '.$nonceInsertCount,['class'=>get_class($nonceDb)]);
+                return false;
+            }
+        } catch (\Exception $e) {
+            $this->logger->info('Codisto: '.$e->getMessage(),['trace'=>$e->getTrace()]);
+            if (property_exists($e, 'errorInfo') &&
+                    $e->errorInfo[0] == 'HY000' &&
+                    $e->errorInfo[1] == 8 &&
+                    $e->errorInfo[2] == 'attempt to write a readonly database') {
+                if ($this->file->fileExists($nonceDbPath)) {
+                    $this->file->rm($nonceDbPath);
+                }
+            } elseif (property_exists($e, 'errorInfo') &&
+                    $e->errorInfo[0] == 'HY000' &&
+                    $e->errorInfo[1] == 11 &&
+                    $e->errorInfo[2] == 'database disk image is malformed') {
+                if ($this->file->fileExists($nonceDbPath)) {
+                    $this->file->rm($nonceDbPath);
+                }
+            } else {
+                $this->logger->info('Exception: '.$e->getMessage()
+                .' on line: '.$e->getLine()
+                .' in file: '.$e->getFile());
+                return false;
+            }
+        }
         return $this->checkHash($key, $nonce, $hash);
     }
 
     public function checkHash($Key, $Nonce, $Hash)
     {
         $Sig = base64_encode(hash('sha256', $Key . $Nonce, true));
-				$this->logger->info('checkHash. Key: '.$Key.', Nonce: '.$Nonce.', hash: '.$hash.', Sig: '.$Sig);
+        $this->logger->info('checkHash. Key: '.$Key.', Nonce: '.$Nonce.', hash: '.$hash.', Sig: '.$Sig);
 
         return hash_equals($Hash, $Sig);
     }
