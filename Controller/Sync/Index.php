@@ -35,6 +35,7 @@ class Index extends \Magento\Framework\App\Action\Action
     private $codistoHelper;
     private $sync;
     private $visitor;
+		private $logger;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -45,7 +46,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Response\Http\FileFactory $fileFactory,
         \Magento\Customer\Model\Visitor $visitor,
         \Codisto\Connect\Helper\Data $codistoHelper,
-        \Codisto\Connect\Model\Sync $sync
+        \Codisto\Connect\Model\Sync $sync,
+				\Psr\Log\LoggerInterface $logger
     ) {
         parent::__construct($context);
 
@@ -58,6 +60,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->codistoHelper = $codistoHelper;
         $this->sync = $sync;
         $this->visitor = $visitor;
+				$this->logger = $logger;
     }
 
     private function _storeId($request)
