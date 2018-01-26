@@ -1028,6 +1028,7 @@ class Index extends \Magento\Framework\App\Action\Action
     public function execute() // @codingStandardsIgnoreLine Generic.Metrics.CyclomaticComplexity.TooHigh
     {
 			try{
+				$this->logger->info('Codisto Request',['url'=>$this->_request->getRequestUri()]);
         $this->visitor->setSkipRequestLogging(true);
 
         // @codingStandardsIgnoreStart
