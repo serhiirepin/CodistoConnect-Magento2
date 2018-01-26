@@ -1024,6 +1024,7 @@ class Index extends \Magento\Framework\App\Action\Action
     // so overriding code sniffer warnings
     public function execute() // @codingStandardsIgnoreLine Generic.Metrics.CyclomaticComplexity.TooHigh
     {
+			try{
         $this->visitor->setSkipRequestLogging(true);
 
         // @codingStandardsIgnoreStart
@@ -1101,6 +1102,11 @@ class Index extends \Magento\Framework\App\Action\Action
             default:
                 return $this->_sendPlainResponse(200, 'OK', 'No Action');
         }
+			}catch (\Exception $e){
+					// Code to log something here.
+					$this->logger->info('Codisto: '.$e->getMessage(),['trace'=>$e->getTrace()]);
+					throw $e;
+			}
     }
 
     private function _checkHash($store, $server)
