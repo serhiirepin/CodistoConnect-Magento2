@@ -35,7 +35,6 @@ class Index extends \Magento\Framework\App\Action\Action
     private $codistoHelper;
     private $sync;
     private $visitor;
-		private $logger;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -46,8 +45,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Response\Http\FileFactory $fileFactory,
         \Magento\Customer\Model\Visitor $visitor,
         \Codisto\Connect\Helper\Data $codistoHelper,
-        \Codisto\Connect\Model\Sync $sync,
-				\Psr\Log\LoggerInterface $logger
+        \Codisto\Connect\Model\Sync $sync
     ) {
         parent::__construct($context);
 
@@ -60,7 +58,6 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->codistoHelper = $codistoHelper;
         $this->sync = $sync;
         $this->visitor = $visitor;
-				$this->logger = $logger;
     }
 
     private function _storeId($request)
@@ -1027,8 +1024,6 @@ class Index extends \Magento\Framework\App\Action\Action
     // so overriding code sniffer warnings
     public function execute() // @codingStandardsIgnoreLine Generic.Metrics.CyclomaticComplexity.TooHigh
     {
-			try{
-				$this->logger->info('Codisto Request',['url'=>$this->_request->getRequestUri()]);
         $this->visitor->setSkipRequestLogging(true);
 
         // @codingStandardsIgnoreStart
@@ -1106,11 +1101,6 @@ class Index extends \Magento\Framework\App\Action\Action
             default:
                 return $this->_sendPlainResponse(200, 'OK', 'No Action');
         }
-			}catch (\Exception $e){
-					// Code to log something here.
-					$this->logger->info('Codisto: '.$e->getMessage(),['trace'=>$e->getTrace()]);
-					throw $e;
-			}
     }
 
     private function _checkHash($store, $server)

@@ -253,11 +253,7 @@ class Sync
                     $update->bindParam(3, $lastModified);
                     $update->execute();
 
-                    $countQuery = $db->query('SELECT changes()');
-                    $updateCount = (int)$countQuery->fetchColumn();
-                    $countQuery->closeCursor();
-
-                    if ($updateCount == 0) {
+                    if ($update->rowCount() == 0) {
                         $insert->bindParam(1, $name);
                         $insert->bindParam(2, $content);
                         $insert->bindParam(3, $lastModified);

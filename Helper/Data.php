@@ -152,17 +152,10 @@ class Data
             $nonceDb->exec('CREATE TABLE IF NOT EXISTS nonce (value text NOT NULL PRIMARY KEY)');
             $qry = $nonceDb->prepare('INSERT OR IGNORE INTO nonce (value) VALUES(?)');
             $qry->execute([$nonce]);
-
-            $countQuery = $nonceDb->query('SELECT changes()');
-            $nonceInsertCount = (int)$countQuery->fetchColumn();
-            $countQuery->closeCursor();
-
-            if (false && $nonceInsertCount !== 1) {
-                $this->logger->info('nonceInsertCount !==1. It is '.$nonceInsertCount,['class'=>get_class($nonceDb)]);
+            if ($qry->rowCount() !== 1) {
                 return false;
             }
         } catch (\Exception $e) {
-            $this->logger->info('Codisto: '.$e->getMessage(),['trace'=>$e->getTrace()]);
             if (property_exists($e, 'errorInfo') &&
                     $e->errorInfo[0] == 'HY000' &&
                     $e->errorInfo[1] == 8 &&
@@ -184,13 +177,13 @@ class Data
                 return false;
             }
         }
+
         return $this->checkHash($key, $nonce, $hash);
     }
 
     public function checkHash($Key, $Nonce, $Hash)
     {
         $Sig = base64_encode(hash('sha256', $Key . $Nonce, true));
-        $this->logger->info('checkHash. Key: '.$Key.', Nonce: '.$Nonce.', Hash: '.$Hash.', Sig: '.$Sig);
 
         return hash_equals($Hash, $Sig);
     }
